@@ -44,6 +44,7 @@ StoreAdmin.loadCategories = function(){
 	},"json");
 };
 
+
 StoreAdmin.loadProducts = function(){
 	$("#products-holder").empty();
 	StoreAdmin.createNewProductBtn();
