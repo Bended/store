@@ -95,7 +95,7 @@ def delete_product(pid):
 def load_products():
     try:
         with connection.cursor() as cursor:
-            sql = ('SELECT category, description, price, title, favorite, img_url, id FROM products')
+            sql = ('SELECT category, description, price, title, favorite, img_url, id FROM products ')
             cursor.execute(sql)
             result = cursor.fetchall()
             return json.dumps({'STATUS':'SUCCESS','PRODUCTS': result})
@@ -103,7 +103,7 @@ def load_products():
         return json.dumps({'STATUS':'ERROR', 'MSG': str(e)})
 
 
-#######   GET PRODUCT    ######
+#######   GET PRODUCT BY Id   ######
 @route("/product/<pid>", method='GET')
 def load_products(pid):
     try:
@@ -121,7 +121,7 @@ def load_products(pid):
 def list_products_cat(id):
     try:
         with connection.cursor() as cursor:
-            sql = ('SELECT category, description, price, title, favorite, img_url, id FROM products WHERE category = {}'.format(id) )
+            sql = ('SELECT category, description, price, title, favorite, img_url, id FROM products WHERE category = {} ORDER BY favorite DESC, creation_date ASC'.format(id) )
             cursor.execute(sql)
             result = cursor.fetchall()
             return json.dumps({'STATUS':'SUCCESS','PRODUCTS': result})
@@ -168,8 +168,7 @@ def add_product():
         try:
             print 're-ici'
             with connection.cursor() as cursor:
-                #sql = "INSERT INTO products VALUES(id, {}, {}, {}, {}, {}, {})".format(category, title, description, price, n_fav, img_url)
-                sql = 'INSERT INTO products VALUES(id,%s,%s,%s,%s,%s,%s)'
+                sql = 'INSERT INTO products VALUES(id,%s,%s,%s,%s,%s,%s,now())'
                 data = (category,title,description,price,n_fav,img_url)
                 print data
                 cursor.execute(sql, data)
