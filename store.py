@@ -60,7 +60,7 @@ def delete_category(catId):
             connection.commit()
             return json.dumps({'STATUS':'SUCCESS', 'MSG': 'The category was deleted successfully'})
     except Exception as e:
-        return json.dumps({'STATUS':'ERROR', 'MSG': e})
+        return json.dumps({'STATUS':'ERROR', 'MSG': str(e)})
 
 
 #######   GET CATEGORIES    ######
@@ -73,13 +73,12 @@ def load_categories():
             result = cursor.fetchall()
             return json.dumps({'STATUS' : 'SUCCESS', 'CATEGORIES':result})
     except Exception as e:
-        return json.dumps({'STATUS' : 'ERROR', 'MSG': e})
+        return json.dumps({'STATUS' : 'ERROR', 'MSG': str(e)})
 
 
 ####### DELETE A PRODUCT  ######
 @route('/product/<pid>', method='DELETE')
 def delete_product(pid):
-    print pid
     try:
         with connection.cursor() as cursor:
             sql = ('DELETE FROM products WHERE id = {}'.format(pid))
@@ -88,7 +87,7 @@ def delete_product(pid):
             return json.dumps({'STATUS':'SUCCES', 'MSG':'The product was deleted successfully'})
     except Exception as e:
         print e
-        return json.dumps({'STATUS':'ERROR', 'MSG': e})            
+        return json.dumps({'STATUS':'ERROR', 'MSG': str(e)})            
 
 
 #######   GET PRODUCTS    ######
@@ -101,7 +100,7 @@ def load_products():
             result = cursor.fetchall()
             return json.dumps({'STATUS':'SUCCESS','PRODUCTS': result})
     except Exception as e:
-        return json.dumps({'STATUS':'ERROR', 'MSG': e})
+        return json.dumps({'STATUS':'ERROR', 'MSG': str(e)})
 
 
 #######   GET PRODUCT    ######
@@ -114,15 +113,12 @@ def load_products(pid):
             result = cursor.fetchall()
             return json.dumps({'STATUS':'SUCCESS','PRODUCTS': result})
     except Exception as e:
-        return json.dumps({'STATUS':'ERROR', 'MSG': e})
-
-
+        return json.dumps({'STATUS':'ERROR', 'MSG': str(e)})
 
 
 ######     List Products by Category     #######
 @route('/category/<id>/products', methode='GET')
 def list_products_cat(id):
-    #id = request.GET.get('id')
     try:
         with connection.cursor() as cursor:
             sql = ('SELECT category, description, price, title, favorite, img_url, id FROM products WHERE category = {}'.format(id) )
@@ -130,15 +126,57 @@ def list_products_cat(id):
             result = cursor.fetchall()
             return json.dumps({'STATUS':'SUCCESS','PRODUCTS': result})
     except Exception as e:
-        return json.dumps({'STATUS':'ERROR', 'MSG': e})
+        return json.dumps({'STATUS':'ERROR', 'MSG': str(e)})
 
 
-'''
 #######   ADD/EDIT A PRODUCT    ######
 @route("/product", method="POST")
 def add_product():
-return "plouf"
-'''
+    id = request.POST.get('id')
+    print id
+    category = request.POST.get('category')
+    print category
+    title = str(request.POST.get('title'))
+    print title
+    description = str(request.POST.get('desc'))
+    print description
+    price = request.POST.get('price')
+    print price
+    favorite = request.POST.get('favorite')
+    print favorite
+    if favorite == None:
+        n_fav = 0
+    else:
+        n_fav = 1
+    print n_fav
+    img_url = request.POST.get('img_url')
+    print img_url
+    if id != '':
+        try:
+            with connection.cursor() as cursor:
+                print 'la'
+                sql = ('UPDATE products SET category=%s, title=%s, description=%s, price=%s, favorite=%s, img_url=%s WHERE id=%s')
+                data = (category,str(title),str(description),price,n_fav,str(img_url), id)
+                cursor.execute(sql, data)
+                connection.commit()
+                return json.dumps({'STATUS':'SUCCESS', 'MSG':'The product was added/updated successfully'})
+        except Exception as e:
+            print e
+            return json.dumps({'STATUS':'ERROR', 'MSG':str(e)})
+    else:
+        print 'ici'
+        try:
+            print 're-ici'
+            with connection.cursor() as cursor:
+                #sql = "INSERT INTO products VALUES(id, {}, {}, {}, {}, {}, {})".format(category, title, description, price, n_fav, img_url)
+                sql = 'INSERT INTO products VALUES(id,%s,%s,%s,%s,%s,%s)'
+                data = (category,title,description,price,n_fav,img_url)
+                print data
+                cursor.execute(sql, data)
+                connection.commit()
+        except Exception as e:
+            print e
+            return json.dumps({'STATUS':'ERROR', 'MSG':str(e)})
 
 
 def main():
