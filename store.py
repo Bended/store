@@ -86,7 +86,6 @@ def delete_product(pid):
             connection.commit()
             return json.dumps({'STATUS':'SUCCES', 'MSG':'The product was deleted successfully'})
     except Exception as e:
-        print e
         return json.dumps({'STATUS':'ERROR', 'MSG': str(e)})            
 
 
@@ -133,48 +132,34 @@ def list_products_cat(id):
 @route("/product", method="POST")
 def add_product():
     id = request.POST.get('id')
-    print id
     category = request.POST.get('category')
-    print category
     title = str(request.POST.get('title'))
-    print title
     description = str(request.POST.get('desc'))
-    print description
     price = request.POST.get('price')
-    print price
     favorite = request.POST.get('favorite')
-    print favorite
     if favorite == None:
         n_fav = 0
     else:
         n_fav = 1
-    print n_fav
     img_url = request.POST.get('img_url')
-    print img_url
     if id != '':
         try:
             with connection.cursor() as cursor:
-                print 'la'
                 sql = ('UPDATE products SET category=%s, title=%s, description=%s, price=%s, favorite=%s, img_url=%s WHERE id=%s')
                 data = (category,str(title),str(description),price,n_fav,str(img_url), id)
                 cursor.execute(sql, data)
                 connection.commit()
                 return json.dumps({'STATUS':'SUCCESS', 'MSG':'The product was added/updated successfully'})
         except Exception as e:
-            print e
             return json.dumps({'STATUS':'ERROR', 'MSG':str(e)})
     else:
-        print 'ici'
         try:
-            print 're-ici'
             with connection.cursor() as cursor:
                 sql = 'INSERT INTO products VALUES(id,%s,%s,%s,%s,%s,%s,now())'
                 data = (category,title,description,price,n_fav,img_url)
-                print data
                 cursor.execute(sql, data)
                 connection.commit()
         except Exception as e:
-            print e
             return json.dumps({'STATUS':'ERROR', 'MSG':str(e)})
 
 
